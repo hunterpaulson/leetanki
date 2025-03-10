@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetAnki</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>LeetAnki</h1>
+      <p class="subtitle">Spaced Repetition for LeetCode</p>
+    </header>
+    
+    <div id="login-message" class="message">
+      <p>Please log in to LeetCode to use this extension</p>
+      <a href="https://leetcode.com/accounts/login/" target="_blank" class="button login-button">Go to LeetCode Login</a>
+    </div>
+    
+    <div id="error-message" class="message error hidden">
+      <p id="error-text">An error occurred</p>
+    </div>
+    
+    <div id="main-content" class="hidden">
+      <div id="user-info" class="user-section">
+        <div class="user-profile">
+          <img id="user-avatar" class="avatar" src="" alt="User avatar">
+          <div class="user-details">
+            <h3 id="username">Username</h3>
+            <a id="profile-link" href="" target="_blank" class="profile-link">View Profile</a>
+          </div>
+        </div>
+        <div id="user-stats" class="user-stats">
+          <div class="stat">
+            <span class="label">Solved:</span>
+            <span id="total-solved" class="value">0</span>
+          </div>
+          <div class="stat-group">
+            <div class="stat-pill easy">
+              <span id="easy-solved">0</span>
+            </div>
+            <div class="stat-pill medium">
+              <span id="medium-solved">0</span>
+            </div>
+            <div class="stat-pill hard">
+              <span id="hard-solved">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <section class="section">
+        <h2>Problems Due for Review</h2>
+        <div id="due-problems" class="problem-list">
+          <p class="loading">Loading...</p>
+        </div>
+      </section>
+      
+      <section class="section">
+        <h2>Recommended Problems</h2>
+        <div id="recommended-problems" class="problem-list">
+          <p class="loading">Loading...</p>
+        </div>
+      </section>
+      
+      <section class="section">
+        <h2>Stats</h2>
+        <div id="stats">
+          <div class="stat-item">
+            <span class="stat-label">Problems Completed:</span>
+            <span id="completed-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Problems Reviewed:</span>
+            <span id="reviewed-count" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Last Sync:</span>
+            <span id="last-sync" class="stat-value">Never</span>
+          </div>
+        </div>
+      </section>
+      
+      <button id="sync-button" class="button">Sync Now</button>
+    </div>
+    
+    <footer>
+      <button id="settings-button" class="icon-button">⚙️</button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 

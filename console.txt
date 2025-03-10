@@ -1,0 +1,232 @@
+124665836.js:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+content.js:19 [LeetAnki Debug] Window load event fired
+content.js:19 [LeetAnki Debug] Trying to initialize on window load
+content.js:19 [LeetAnki Debug] Utilities loaded on window load, initializing
+content.js:19 [LeetAnki Debug] Initializing content script on LeetCode
+content.js:19 [LeetAnki Debug] User avatar element: null
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: false
+content.js:19 [LeetAnki Debug] URL change observer set up
+content.js:19 [LeetAnki Debug] User avatar element: null
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: false
+content.js:19 [LeetAnki Debug] Initialization complete
+content.js:19 [LeetAnki Debug] Auth status from background: false
+content.js:19 [LeetAnki Debug] Current detected auth status: false
+assets.giocdn.com/2.1/gio.js:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+new-libs.36aefae4d.js:1 worker error Event undefined undefined
+console.<computed> @ new-libs.36aefae4d.js:1
+leetcode.com/:1 Uncaught (in promise) Event
+content.js:19 [LeetAnki Debug] API accessible: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'isContentScriptReady'}
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'fetchSolvedProblems'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:708 [LeetAnki Debug] Fetching completed problems via API
+content.js:712 [LeetAnki Debug] Current username value: hunterpaulson
+content.js:719 [LeetAnki Debug] Fetching problems for user: hunterpaulson
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:787 [LeetAnki Debug] User has solved 492 problems in total
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 0
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=0&limit=100
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 0
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 20
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=20&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221559437035%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222025-03-01T16%253A51%253A48.948837%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 20
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 40
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=40&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221545447809%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222025-02-16T19%253A19%253A59.692749%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 40
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 60
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=60&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221533994292%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222025-02-06T19%253A35%253A15.761391%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] Authentication status changed: true
+content.js:19 [LeetAnki Debug] Avatar URL: https://assets.leetcode.com/users/default_avatar.jpg
+content.js:19 [LeetAnki Debug] Auth status update response: {success: true}
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 60
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 80
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=80&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221519524249%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222025-01-24T23%253A39%253A10.319265%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 80
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 100
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=100&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221504507646%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222025-01-10T22%253A18%253A35.561442%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 100
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 120
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=120&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221493490805%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-31T17%253A00%253A14.807774%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 120
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 140
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=140&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221489368236%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-27T02%253A53%253A28.722884%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 140
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 160
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=160&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221482494068%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-19T02%253A16%253A52.327536%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 160
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 180
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=180&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221477234148%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-12T18%253A12%253A47.466715%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 180
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 200
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=200&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221470687266%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-05T04%253A11%253A57.506262%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 200
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 220
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=220&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221466907805%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-12-01T01%253A45%253A14.384397%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 220
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 240
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=240&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221461155555%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-11-23T22%253A41%253A42.993710%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 240
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 260
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=260&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221455559303%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-11-17T18%253A48%253A09.268832%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 260
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 280
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=280&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221450785805%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-11-12T16%253A54%253A12.967313%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 280
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 300
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=300&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221446308605%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-11-08T01%253A55%253A46.088592%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 300
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 320
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=320&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221444194449%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-11-05T20%253A26%253A17.286000%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 320
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 340
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=340&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221438413406%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-10-30T17%253A48%253A49.971867%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 340
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 360
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=360&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221432587221%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-10-24T16%253A14%253A22.017653%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 360
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 380
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=380&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221423755179%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-10-16T00%253A48%253A00.875269%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}data: {userStatus: {…}}[[Prototype]]: Object
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:858 [LeetAnki Debug] Fetched 20 submissions from offset 380
+content.js:805 [LeetAnki Debug] Fetching submissions batch with offset 400
+content.js:813 [LeetAnki Debug] API URL: https://leetcode.com/api/submissions/?offset=400&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221413173739%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-10-06T02%253A44%253A06.736566%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D
+content.js:820 
+            
+            
+           GET https://leetcode.com/api/submissions/?offset=400&limit=100&lastkey=%257B%2522pk%2522%253A%2520%257B%2522N%2522%253A%2520%25221413173739%2522%257D%252C%2520%2522dt%2522%253A%2520%257B%2522S%2522%253A%2520%25222024-10-06T02%253A44%253A06.736566%252B0000%2522%257D%252C%2520%2522sid%2522%253A%2520%257B%2522N%2522%253A%2520%25221967720%2522%257D%257D 403 (Forbidden)
+fetchSubmissionProblems @ content.js:820
+await in fetchSubmissionProblems
+fetchCompletedProblems @ content.js:722
+(anonymous) @ content.js:1002
+Promise.then
+(anonymous) @ content.js:998
+content.js:829 [LeetAnki Debug] API returned status 403
+content.js:833 [LeetAnki Debug] Received 403 Forbidden - this may be a rate limit or API restriction
+content.js:887 [LeetAnki Debug] Fetched a total of 400 submissions from API
+content.js:917 [LeetAnki Debug] Got 192 unique problems after deduplication
+content.js:921 [LeetAnki Debug] Found 192 accepted submissions
+content.js:723 [LeetAnki Debug] Fetched 192 problems from submissions
+content.js:731 [LeetAnki Debug] Found 0 previously stored problems
+content.js:739 [LeetAnki Debug] Total unique problems after merge: 192
+content.js:1009 [LeetAnki Debug] Fetched solved problems: 192
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:975 [LeetAnki Debug] Received message: {action: 'checkAuthStatus'}
+content.js:668 [LeetAnki Debug] Authentication API response: {data: {…}}
+content.js:986 [LeetAnki Debug] Auth status API result: {isAuthenticated: true, username: 'hunterpaulson', userId: 1858100}
+content.js:684 [LeetAnki Debug] Updated auth status in storage: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true
+content.js:19 [LeetAnki Debug] User avatar element: <img src=​"https:​/​/​assets.leetcode.com/​users/​default_avatar.jpg" alt=​"avatar" class=​"h-full w-full rounded-full object-cover">​
+content.js:19 [LeetAnki Debug] User dropdown element: null
+content.js:19 [LeetAnki Debug] Profile link element: null
+content.js:19 [LeetAnki Debug] Authentication check result: true

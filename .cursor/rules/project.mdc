@@ -1,0 +1,106 @@
+---
+description: project development plan
+globs: 
+alwaysApply: true
+---
+# Building a LeetCode Spaced Repetition Browser Extension
+
+You will help me build a browser extension that implements spaced repetition learning for LeetCode problems. The extension will track which problems a user has completed, apply spaced repetition algorithms to determine which problem types need revisiting, and recommend new problems accordingly.
+
+You must follow these instructions precisely. I need extremely specific guidance for each implementation step. After each major implementation milestone, you must stop and ask for feedback before proceeding to the next step.
+
+## Phase 1: Extension Setup and User Authentication
+
+### Step 1.1: Create Basic Extension Structure
+Provide the exact file structure and boilerplate code for a Chrome extension with the following components:
+- manifest.json (use Manifest V3)
+- background script
+- popup interface
+- content script that will run on LeetCode pages
+- necessary HTML/CSS files
+
+### Step 1.2: Implement LeetCode Authentication Detection
+The extension needs to know when a user is logged into LeetCode. Implement a system that can:
+- Detect when a user is authenticated on LeetCode
+- Store the authentication state
+- Handle authentication changes
+
+## Phase 2: Fetch and Store User Completion Data
+
+### Step 2.1: Analyze LeetCode API/DOM Structure
+Provide detailed instructions for:
+- Identifying how to access the user's completed problems (either via API or DOM scraping)
+- The exact API endpoints or DOM elements to target
+- How to extract problem metadata (problem ID, title, difficulty, tags/categories)
+
+### Step 2.2: Implement Data Retrieval
+Create specific code that:
+- Fetches the user's completed problems
+- Extracts all necessary metadata
+- Handles errors and rate limiting
+- Implements periodic refresh of this data
+
+### Step 2.3: Design Data Storage Schema
+Define the exact schema for storing:
+- Problem completion history
+- Problem metadata (types, difficulty, etc.)
+- Spaced repetition data (next review dates, ease factors, etc.)
+
+### Step 2.4: Implement Browser Storage
+Create code that:
+- Saves all fetched data using the Chrome storage API
+- Properly manages storage limits
+- Implements data versioning for future updates
+
+## Phase 3: Spaced Repetition Algorithm
+
+### Step 3.1: Implement SM-2 Algorithm
+Create a precise implementation of the SM-2 spaced repetition algorithm that:
+- Calculates intervals between problem reviews
+- Adjusts difficulty factors based on user performance
+- Determines which problem types need review
+
+### Step 3.2: Problem Type Classification System
+Develop code that:
+- Maps LeetCode tags/categories to your internal classification system
+- Handles the relationship between problem types (e.g., how a stack problem may satisfy list skill practice)
+- Determines which skills are exercised by each problem
+
+## Phase 4: Problem Recommendation Engine
+
+### Step 4.1: Create Query System
+Implement a function that:
+- Takes the list of problem types that need review
+- Queries the stored problem database
+- Returns appropriate problems for practice
+- Balances review needs with appropriate difficulty progression
+
+### Step 4.2: User Interface for Recommendations
+Create the popup UI that:
+- Shows which problem types need review
+- Recommends specific problems to practice
+- Allows users to mark problems as completed or rate their difficulty
+- Provides direct links to the recommended problems
+
+## Development Workflow Requirements
+
+1. After completing EACH numbered step, pause and ask for feedback before continuing. Do not proceed to the next step until explicitly instructed.
+
+2. For each implementation step, provide:
+   - Complete, ready-to-use code (no pseudocode)
+   - Explanations of how the code works
+   - Any assumptions made
+   - Potential limitations or future improvements
+
+3. When writing code, focus on:
+   - Maintainability
+   - Error handling
+   - Performance considerations
+   - Security best practices
+
+4. When recommending API approaches or DOM interaction, provide:
+   - Specific endpoints, paths, or selectors
+   - Expected response formats or DOM structures
+   - Fallback strategies if primary methods fail
+
+Let's begin with Phase 1, Step 1.1: Creating the basic extension structure. Please provide the complete file structure and code for setting up the initial Chrome extension.

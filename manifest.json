@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "LeetAnki - LeetCode Spaced Repetition",
+  "version": "1.0.0",
+  "description": "A spaced repetition system for LeetCode problems",
+  "permissions": [
+    "storage",
+    "alarms",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": [
+        "content/leetcode-api.js",
+        "content/leetcode-dom.js", 
+        "content/content.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
+} 
