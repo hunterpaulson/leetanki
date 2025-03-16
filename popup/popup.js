@@ -1,583 +1,359 @@
-// LeetAnki Popup Script
+/**
+ * LeetAnki Popup Script
+ * 
+ * Handles the popup UI interactions and displays user data,
+ * problem lists, and review options.
+ */
 
-// Define storage keys (should match those in background.js)
+// Constants for storage keys (keep in sync with background.js)
 const STORAGE_KEYS = {
   AUTH_STATUS: 'authStatus',
   USER_INFO: 'userInfo',
-  USER_PROFILE: 'userProfile',
-  COMPLETED_PROBLEMS: 'completedProblems',
-  PROBLEM_TYPES: 'problemTypes',
-  PROBLEM_METADATA: 'problemMetadata',
-  SPACED_REPETITION_DATA: 'spacedRepetitionData',
+  PROBLEMS: 'problems',
+  TAGS: 'tags', 
+  REVIEW_DATA: 'reviewData',
   LAST_SYNC: 'lastSync',
-  USER_SETTINGS: 'userSettings'
+  SETTINGS: 'settings'
 };
 
-// Enable debug mode
-const debugMode = true;
+// Elements
+const loginMessage = document.getElementById('login-message');
+const mainContent = document.getElementById('main-content');
+const errorMessage = document.getElementById('error-message');
+const errorText = document.getElementById('error-text');
+const dueProblems = document.getElementById('due-problems');
+const recommendedProblems = document.getElementById('recommended-problems');
+const syncButton = document.getElementById('sync-button');
+const settingsButton = document.getElementById('settings-button');
 
-// Helper function for debug logging
-function debugLog(...args) {
-  if (debugMode) {
-    console.log('[LeetAnki Popup]', ...args);
+// User info elements
+const username = document.getElementById('username');
+const userAvatar = document.getElementById('user-avatar');
+const profileLink = document.getElementById('profile-link');
+const totalSolved = document.getElementById('total-solved');
+const easySolved = document.getElementById('easy-solved');
+const mediumSolved = document.getElementById('medium-solved');
+const hardSolved = document.getElementById('hard-solved');
+
+// Stats elements
+const completedCount = document.getElementById('completed-count');
+const reviewedCount = document.getElementById('reviewed-count');
+const lastSync = document.getElementById('last-sync');
+
+// Initialize the popup
+async function initialize() {
+  try {
+    // Get authentication status
+    const data = await chrome.storage.local.get([
+      STORAGE_KEYS.AUTH_STATUS,
+      STORAGE_KEYS.USER_INFO
+    ]);
+    
+    const isAuthenticated = data[STORAGE_KEYS.AUTH_STATUS];
+    
+    if (isAuthenticated) {
+      // Show main content
+      loginMessage.style.display = 'none';
+      mainContent.style.display = 'block';
+      
+      // Update user info
+      updateUserInfo(data[STORAGE_KEYS.USER_INFO]);
+      
+      // Load problems and stats
+      await loadProblems();
+      await updateStats();
+      
+      // Get due reviews
+      await loadDueReviews();
+      
+      // Load recommended problems
+      await loadRecommendedProblems();
+    } else {
+      // Show login message
+      loginMessage.style.display = 'block';
+      mainContent.style.display = 'none';
+    }
+  } catch (error) {
+    showError('Error initializing popup: ' + error.message);
+    console.error('Error initializing popup:', error);
   }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // Elements - Main sections
-  const loginMessage = document.getElementById('login-message');
-  const mainContent = document.getElementById('main-content');
-  const dueProblems = document.getElementById('due-problems');
-  const recommendedProblems = document.getElementById('recommended-problems');
-  const completedCount = document.getElementById('completed-count');
-  const reviewedCount = document.getElementById('reviewed-count');
-  const lastSync = document.getElementById('last-sync');
-  const syncButton = document.getElementById('sync-button');
-  const settingsButton = document.getElementById('settings-button');
+// Update user information display
+function updateUserInfo(userInfo) {
+  if (!userInfo) return;
   
-  // Elements - User info section
-  const userAvatarElement = document.getElementById('user-avatar');
-  const usernameElement = document.getElementById('username');
-  const profileLinkElement = document.getElementById('profile-link');
-  const totalSolvedElement = document.getElementById('total-solved');
-  const easySolvedElement = document.getElementById('easy-solved');
-  const mediumSolvedElement = document.getElementById('medium-solved');
-  const hardSolvedElement = document.getElementById('hard-solved');
+  username.textContent = userInfo.username;
+  profileLink.href = `https://leetcode.com/${userInfo.username}/`;
+  
+  // Set default avatar (can be customized later)
+  userAvatar.src = `https://leetcode.com/avatar/${userInfo.username}.png` || 
+                   'https://leetcode.com/static/images/avatar-default.png';
+}
 
-  // Initialize popup
-  await updatePopupContent();
-  
-  // Set up periodic refresh
-  setInterval(updatePopupContent, 5000);
-
-  // Event listeners
-  syncButton.addEventListener('click', handleSyncClick);
-  settingsButton.addEventListener('click', openSettings);
-  
-  // Fix: Remove the event listener and use the default anchor tag behavior
-  // This prevents duplicate tab opening
-  const loginButton = document.querySelector('.login-button');
-  if (loginButton) {
-    // Remove any default href attribute to prevent automatic navigation
-    const leetCodeLoginUrl = loginButton.getAttribute('href');
-    loginButton.removeAttribute('href');
+// Load problems from storage
+async function loadProblems() {
+  try {
+    const data = await chrome.storage.local.get([
+      STORAGE_KEYS.PROBLEMS
+    ]);
     
-    loginButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      debugLog('Login button clicked');
-      
-      // Open LeetCode in a new tab
-      chrome.tabs.create({ url: leetCodeLoginUrl || 'https://leetcode.com/accounts/login/' });
+    const problems = data[STORAGE_KEYS.PROBLEMS] || {};
+    
+    // Count problems by difficulty
+    let easy = 0, medium = 0, hard = 0;
+    
+    Object.values(problems).forEach(problem => {
+      switch (problem.difficulty.toLowerCase()) {
+        case 'easy':
+          easy++;
+          break;
+        case 'medium':
+          medium++;
+          break;
+        case 'hard':
+          hard++;
+          break;
+      }
     });
+    
+    // Update UI
+    totalSolved.textContent = Object.keys(problems).length;
+    easySolved.textContent = easy;
+    mediumSolved.textContent = medium;
+    hardSolved.textContent = hard;
+    
+    return problems;
+  } catch (error) {
+    showError('Error loading problems: ' + error.message);
+    console.error('Error loading problems:', error);
+    return {};
   }
+}
 
-  /**
-   * Updates the problem statistics in the popup UI
-   * @param {number} problemCount - The number of completed problems
-   * @param {Date|null} lastSyncTime - The timestamp of the last sync
-   */
-  function updateProblemStats(problemCount, lastSyncTime) {
-    const completedCountElement = document.getElementById('completed-count');
-    const lastSyncElement = document.getElementById('last-sync');
+// Load due reviews
+async function loadDueReviews() {
+  try {
+    // Request due reviews from the background script
+    const response = await chrome.runtime.sendMessage({ action: 'getDueReviews' });
     
-    if (completedCountElement) {
-      completedCountElement.textContent = problemCount;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to load due reviews');
     }
     
-    if (lastSyncElement) {
-      if (lastSyncTime) {
-        const formattedDate = lastSyncTime.toLocaleString();
-        lastSyncElement.textContent = formattedDate;
-      } else {
-        lastSyncElement.textContent = 'Never';
-      }
+    const reviews = response.reviews || [];
+    
+    // Update UI
+    dueProblems.innerHTML = '';
+    
+    if (reviews.length === 0) {
+      dueProblems.innerHTML = '<p class="no-items">No problems due for review</p>';
+      return;
     }
+    
+    // Create a problem item for each review
+    reviews.forEach(problem => {
+      const problemEl = createProblemElement(problem);
+      
+      // Add review buttons
+      const reviewButtons = document.createElement('div');
+      reviewButtons.className = 'review-buttons';
+      
+      const buttons = [
+        { text: 'Again', class: 'btn-again', result: 'again' },
+        { text: 'Hard', class: 'btn-hard', result: 'hard' },
+        { text: 'Good', class: 'btn-good', result: 'good' },
+        { text: 'Easy', class: 'btn-easy', result: 'easy' }
+      ];
+      
+      buttons.forEach(button => {
+        const btnEl = document.createElement('button');
+        btnEl.className = `review-btn ${button.class}`;
+        btnEl.textContent = button.text;
+        btnEl.addEventListener('click', () => recordReview(problem.titleSlug, button.result));
+        reviewButtons.appendChild(btnEl);
+      });
+      
+      problemEl.appendChild(reviewButtons);
+      dueProblems.appendChild(problemEl);
+    });
+  } catch (error) {
+    dueProblems.innerHTML = `<p class="error">Error loading reviews: ${error.message}</p>`;
+    console.error('Error loading due reviews:', error);
   }
+}
 
-  /**
-   * Update popup content based on storage data
-   */
-  async function updatePopupContent() {
-    console.log('[LeetAnki Popup] Updating popup content');
+// Record a review result
+async function recordReview(problemId, result) {
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'recordReview',
+      problemId,
+      result
+    });
     
-    try {
-      // Check if we have a LeetCode tab open
-      const tabs = await chrome.tabs.query({ url: "https://leetcode.com/*" });
-      
-      if (tabs.length > 0) {
-        console.log('[LeetAnki Popup] Found LeetCode tab, checking auth status directly');
-        
-        try {
-          // Send a message to the content script to check auth status
-          const authStatus = await chrome.tabs.sendMessage(tabs[0].id, { action: 'checkAuthStatus' });
-          console.log('[LeetAnki Popup] Auth status response:', authStatus);
-          
-          if (authStatus && authStatus.isAuthenticated) {
-            console.log('[LeetAnki Popup] User is authenticated according to API');
-            showAuthenticatedState(authStatus.username);
-            
-            // Load completed problems count
-            const storageData = await chrome.storage.local.get(['completedProblems', 'lastSyncTime']);
-            const problemCount = storageData.completedProblems?.length || 0;
-            const lastSync = storageData.lastSyncTime ? new Date(storageData.lastSyncTime) : null;
-            
-            updateProblemStats(problemCount, lastSync);
-            return; // Exit early if authenticated
-          }
-        } catch (error) {
-          console.error('[LeetAnki Popup] Error getting auth status from tab:', error);
-          // Fall through to storage check
-        }
-      }
-      
-      // Check storage as fallback or if tab communication failed
-      console.log('[LeetAnki Popup] Checking auth status from storage');
-      const storageData = await chrome.storage.local.get(['authStatus', 'username']);
-      console.log('[LeetAnki Popup] Auth status from storage:', storageData.authStatus);
-      
-      if (storageData.authStatus) {
-        console.log('[LeetAnki Popup] User is authenticated according to storage');
-        showAuthenticatedState(storageData.username);
-        
-        const problemData = await chrome.storage.local.get(['completedProblems', 'lastSyncTime']);
-        const problemCount = problemData.completedProblems?.length || 0;
-        const lastSync = problemData.lastSyncTime ? new Date(problemData.lastSyncTime) : null;
-        
-        updateProblemStats(problemCount, lastSync);
-      } else {
-        console.log('[LeetAnki Popup] User is not authenticated according to storage');
-        showUnauthenticatedState();
-      }
-    } catch (error) {
-      console.error('[LeetAnki Popup] Error updating popup:', error);
-      showErrorState(error.message);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to record review');
     }
+    
+    // Reload due reviews
+    await loadDueReviews();
+    await updateStats();
+  } catch (error) {
+    showError('Error recording review: ' + error.message);
+    console.error('Error recording review:', error);
   }
+}
+
+// Load recommended problems
+async function loadRecommendedProblems() {
+  try {
+    const data = await chrome.storage.local.get([
+      STORAGE_KEYS.PROBLEMS,
+      STORAGE_KEYS.REVIEW_DATA,
+      STORAGE_KEYS.TAGS
+    ]);
+    
+    const problems = data[STORAGE_KEYS.PROBLEMS] || {};
+    const reviewData = data[STORAGE_KEYS.REVIEW_DATA] || {};
+    const tags = data[STORAGE_KEYS.TAGS] || {};
+    
+    // Find problems that haven't been reviewed yet
+    const unreviewed = Object.entries(problems)
+      .filter(([titleSlug]) => !reviewData[titleSlug])
+      .map(([_, problem]) => problem);
+    
+    // Select up to 5 random problems
+    const recommended = unreviewed
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 5);
+    
+    // Update UI
+    recommendedProblems.innerHTML = '';
+    
+    if (recommended.length === 0) {
+      recommendedProblems.innerHTML = '<p class="no-items">No recommendations available</p>';
+      return;
+    }
+    
+    // Create a problem item for each recommended problem
+    recommended.forEach(problem => {
+      const problemEl = createProblemElement(problem);
+      recommendedProblems.appendChild(problemEl);
+    });
+  } catch (error) {
+    recommendedProblems.innerHTML = `<p class="error">Error loading recommendations: ${error.message}</p>`;
+    console.error('Error loading recommended problems:', error);
+  }
+}
+
+// Create a problem element
+function createProblemElement(problem) {
+  const problemEl = document.createElement('div');
+  problemEl.className = 'problem-item';
   
-  /**
-   * Update the user information section
-   * @param {Object} userInfo Basic user information
-   * @param {Object} userProfile User profile with problem stats
-   */
-  function updateUserInfo(userInfo, userProfile) {
-    // Update username and avatar if available
-    if (userInfo) {
-      usernameElement.textContent = userInfo.username || 'LeetCode User';
-      
-      if (userInfo.avatar) {
-        userAvatarElement.src = userInfo.avatar;
-      } else {
-        // Set a default avatar or initial
-        userAvatarElement.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ddd"/><text x="50" y="60" font-size="50" text-anchor="middle" fill="%23666">' + (userInfo.username ? userInfo.username[0].toUpperCase() : 'L') + '</text></svg>';
-      }
-      
-      // Update profile link
-      if (userInfo.profileUrl) {
-        profileLinkElement.href = 'https://leetcode.com' + userInfo.profileUrl;
-      } else if (userInfo.username) {
-        profileLinkElement.href = `https://leetcode.com/u/${userInfo.username}/`;
-      } else {
-        profileLinkElement.href = 'https://leetcode.com/';
-      }
-    }
+  const link = document.createElement('a');
+  link.href = problem.url;
+  link.className = 'problem-title';
+  link.textContent = problem.title;
+  link.target = '_blank';
+  problemEl.appendChild(link);
+  
+  const difficulty = document.createElement('span');
+  difficulty.className = `problem-difficulty difficulty-${problem.difficulty.toLowerCase()}`;
+  difficulty.textContent = problem.difficulty;
+  problemEl.appendChild(difficulty);
+  
+  return problemEl;
+}
+
+// Update statistics display
+async function updateStats() {
+  try {
+    const data = await chrome.storage.local.get([
+      STORAGE_KEYS.PROBLEMS,
+      STORAGE_KEYS.REVIEW_DATA,
+      STORAGE_KEYS.LAST_SYNC
+    ]);
     
-    // Update problem solving stats if available
-    if (userProfile) {
-      totalSolvedElement.textContent = userProfile.totalSolved || 0;
-      easySolvedElement.textContent = userProfile.easySolved || 0;
-      mediumSolvedElement.textContent = userProfile.mediumSolved || 0;
-      hardSolvedElement.textContent = userProfile.hardSolved || 0;
+    const problems = data[STORAGE_KEYS.PROBLEMS] || {};
+    const reviewData = data[STORAGE_KEYS.REVIEW_DATA] || {};
+    const lastSyncTime = data[STORAGE_KEYS.LAST_SYNC];
+    
+    // Update UI
+    completedCount.textContent = Object.keys(problems).length;
+    reviewedCount.textContent = Object.keys(reviewData).length;
+    
+    if (lastSyncTime) {
+      const lastSyncDate = new Date(lastSyncTime);
+      lastSync.textContent = lastSyncDate.toLocaleString();
     } else {
-      // Default values if profile not available
-      totalSolvedElement.textContent = 0;
-      easySolvedElement.textContent = 0;
-      mediumSolvedElement.textContent = 0;
-      hardSolvedElement.textContent = 0;
+      lastSync.textContent = 'Never';
     }
+  } catch (error) {
+    console.error('Error updating stats:', error);
   }
+}
 
-  /**
-   * Populate the due problems list
-   * @param {Object} data Storage data
-   */
-  async function populateDueProblems(data) {
-    try {
-      dueProblems.innerHTML = '<p class="loading">Loading...</p>';
-      
-      const spacedRepetitionData = data[STORAGE_KEYS.SPACED_REPETITION_DATA] || {};
-      const problemMetadata = data[STORAGE_KEYS.PROBLEM_METADATA] || {};
-      const now = new Date();
-      
-      // Find problems that are due for review
-      const dueProblemsArray = Object.keys(spacedRepetitionData)
-        .filter(slug => {
-          const problem = spacedRepetitionData[slug];
-          const dueDate = new Date(problem.dueDate);
-          return dueDate <= now;
-        })
-        .map(slug => ({
-          slug,
-          metadata: problemMetadata[slug] || {},
-          srpData: spacedRepetitionData[slug]
-        }))
-        .sort((a, b) => new Date(a.srpData.dueDate) - new Date(b.srpData.dueDate));
-      
-      if (dueProblemsArray.length === 0) {
-        dueProblems.innerHTML = '<p>No problems due for review</p>';
-        return;
-      }
-      
-      // Create HTML for the due problems
-      let html = '';
-      dueProblemsArray.slice(0, 5).forEach(problem => {
-        const difficultyClass = problem.metadata.difficulty ? 
-          `difficulty-${problem.metadata.difficulty.toLowerCase()}` : 'difficulty-medium';
-        
-        html += `
-          <div class="problem-item">
-            <a href="https://leetcode.com/problems/${problem.slug}/" 
-               class="problem-title" target="_blank">
-              ${problem.metadata.title || problem.slug}
-            </a>
-            <span class="problem-difficulty ${difficultyClass}">
-              ${problem.metadata.difficulty || 'Medium'}
-            </span>
-          </div>
-        `;
-      });
-      
-      dueProblems.innerHTML = html;
-    } catch (error) {
-      console.error('Error populating due problems:', error);
-      dueProblems.innerHTML = '<p>Error loading problems</p>';
-    }
-  }
+// Show error message
+function showError(message) {
+  errorText.textContent = message;
+  errorMessage.classList.remove('hidden');
+  
+  // Hide after 5 seconds
+  setTimeout(() => {
+    errorMessage.classList.add('hidden');
+  }, 5000);
+}
 
-  /**
-   * Populate the recommended problems list
-   * @param {Object} data Storage data
-   */
-  async function populateRecommendedProblems(data) {
-    try {
-      recommendedProblems.innerHTML = '<p class="loading">Loading...</p>';
-      
-      // For now, just show recently completed problems
-      // In Phase 4, we'll implement proper recommendations
-      const completedProblemsArray = data[STORAGE_KEYS.COMPLETED_PROBLEMS] || [];
-      const problemMetadata = data[STORAGE_KEYS.PROBLEM_METADATA] || {};
-      
-      if (completedProblemsArray.length === 0) {
-        recommendedProblems.innerHTML = '<p>No completed problems yet</p>';
-        return;
-      }
-      
-      // Sort by completion date (newest first)
-      const sortedProblems = [...completedProblemsArray]
-        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
-      
-      // Create HTML for recent problems
-      let html = '';
-      sortedProblems.slice(0, 5).forEach(problem => {
-        const metadata = problemMetadata[problem.titleSlug] || {};
-        const difficultyClass = metadata.difficulty ? 
-          `difficulty-${metadata.difficulty.toLowerCase()}` : 'difficulty-medium';
-        
-        html += `
-          <div class="problem-item">
-            <a href="${problem.url}" class="problem-title" target="_blank">
-              ${metadata.title || problem.titleSlug}
-            </a>
-            <span class="problem-difficulty ${difficultyClass}">
-              ${metadata.difficulty || 'Medium'}
-            </span>
-          </div>
-        `;
-      });
-      
-      recommendedProblems.innerHTML = html;
-    } catch (error) {
-      console.error('Error populating recommended problems:', error);
-      recommendedProblems.innerHTML = '<p>Error loading recommendations</p>';
-    }
-  }
-
-  /**
-   * Handle sync button click
-   */
-  async function handleSyncClick() {
+// Add event listeners
+syncButton.addEventListener('click', async () => {
+  try {
     syncButton.disabled = true;
     syncButton.textContent = 'Syncing...';
     
-    try {
-      // First check if user is authenticated directly from LeetCode tab
-      const authResponse = await sendMessageToLeetCodeTab('checkAuthStatus');
-      
-      if (authResponse && authResponse.isAuthenticated) {
-        debugLog('Authentication verified from tab, proceeding with sync');
-        
-        // Update auth status in storage to ensure consistency
-        await chrome.storage.local.set({ [STORAGE_KEYS.AUTH_STATUS]: true });
-        
-        // Now send the sync message to background
-        chrome.runtime.sendMessage({ action: 'syncCompletedProblems' }, (response) => {
-          if (response && response.success) {
-            debugLog('Sync request acknowledged by background script');
-            updatePopupContent();
-          } else {
-            console.error('Sync request failed:', response?.error);
-            // Show error message to user
-            alert('Sync failed. Please try again or refresh the LeetCode tab.');
-          }
-          
-          syncButton.disabled = false;
-          syncButton.textContent = 'Sync Now';
-        });
-      } else {
-        debugLog('Not authenticated according to tab check');
-        
-        // Check if we have a LeetCode tab open
-        const leetCodeTabs = await chrome.tabs.query({ url: 'https://leetcode.com/*' });
-        
-        if (leetCodeTabs.length === 0) {
-          alert('No LeetCode tab found. Please open LeetCode and try again.');
-        } else {
-          alert('Please log in to LeetCode and refresh the page before syncing.');
-        }
-        
-        syncButton.disabled = false;
-        syncButton.textContent = 'Sync Now';
-      }
-    } catch (error) {
-      console.error('Error during sync:', error);
+    // Find an active LeetCode tab
+    const tabs = await chrome.tabs.query({ url: 'https://leetcode.com/*' });
+    
+    if (tabs.length === 0) {
+      // No LeetCode tab found, open one
+      chrome.tabs.create({ url: 'https://leetcode.com/' });
       syncButton.disabled = false;
       syncButton.textContent = 'Sync Now';
-      alert('Error during sync. Please try again.');
+      showError('Please sync again after LeetCode loads');
+      return;
     }
+    
+    // Send sync message to content script
+    const response = await chrome.tabs.sendMessage(tabs[0].id, { action: 'sync' });
+    
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Sync failed');
+    }
+    
+    // Reload data
+    await loadProblems();
+    await updateStats();
+    await loadDueReviews();
+    await loadRecommendedProblems();
+    
+    syncButton.textContent = 'Sync Complete!';
+    setTimeout(() => {
+      syncButton.disabled = false;
+      syncButton.textContent = 'Sync Now';
+    }, 2000);
+  } catch (error) {
+    syncButton.disabled = false;
+    syncButton.textContent = 'Sync Now';
+    showError('Error syncing: ' + error.message);
+    console.error('Error syncing:', error);
   }
+});
 
-  /**
-   * Open settings page
-   */
-  function openSettings() {
-    // This will be implemented later
-    console.log('Settings button clicked');
-  }
+settingsButton.addEventListener('click', () => {
+  // Placeholder for settings functionality
+  alert('Settings feature coming soon!');
+});
 
-  /**
-   * Send a message to a LeetCode tab and handle errors
-   * @param {string} action - The action to request
-   * @param {Object} params - Additional parameters
-   * @returns {Promise<any>} - The response from the tab
-   */
-  async function sendMessageToLeetCodeTab(action, params = {}) {
-    debugLog(`Sending ${action} message to LeetCode tab`);
-    
-    // Find LeetCode tabs
-    const leetCodeTabs = await chrome.tabs.query({ url: 'https://leetcode.com/*' });
-    
-    if (leetCodeTabs.length === 0) {
-      debugLog('No LeetCode tabs found');
-      showErrorState('No LeetCode tabs found. Please open LeetCode.com in a browser tab.');
-      return null;
-    }
-    
-    // First check if the content script is ready (unless we're already checking that)
-    if (action !== 'isContentScriptReady') {
-      try {
-        const readyCheck = await new Promise((resolve) => {
-          chrome.tabs.sendMessage(
-            leetCodeTabs[0].id,
-            { action: 'isContentScriptReady' },
-            (response) => {
-              if (chrome.runtime.lastError) {
-                debugLog('Content script not ready:', chrome.runtime.lastError);
-                resolve(false);
-              } else {
-                debugLog('Content script is ready:', response);
-                resolve(true);
-              }
-            }
-          );
-          
-          // If we don't get a response within 1 second, assume the content script is not ready
-          setTimeout(() => resolve(false), 1000);
-        });
-        
-        if (!readyCheck) {
-          debugLog('Content script is not ready, showing error');
-          showErrorState('Extension content script is not ready. Please refresh your LeetCode tab and try again.');
-          return null;
-        }
-      } catch (error) {
-        console.error('Error checking if content script is ready:', error);
-        showErrorState('Error checking if content script is ready. Please refresh your LeetCode tab and try again.');
-        return null;
-      }
-    }
-    
-    // Try to send the message to the first tab
-    try {
-      return await new Promise((resolve) => {
-        chrome.tabs.sendMessage(
-          leetCodeTabs[0].id,
-          { action, ...params },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              debugLog('Error sending message to tab:', chrome.runtime.lastError);
-              // Check if this is related to the content script not being injected or ready
-              if (chrome.runtime.lastError.message.includes('Receiving end does not exist')) {
-                debugLog('Content script may not be ready - tab might need a refresh');
-                showErrorState('Extension content script is not ready. Please refresh your LeetCode tab and try again.');
-              } else {
-                showErrorState(`Error communicating with LeetCode: ${chrome.runtime.lastError.message}`);
-              }
-              resolve(null);
-            } else {
-              debugLog(`Received response for ${action}:`, response);
-              resolve(response);
-            }
-          }
-        );
-      });
-    } catch (error) {
-      console.error(`Error sending ${action} message:`, error);
-      showErrorState(`Error: ${error.message}`);
-      return null;
-    }
-  }
-
-  // Update these functions to match the actual element IDs in your HTML
-  function showAuthenticatedState(username) {
-    console.log('[LeetAnki Popup] Showing authenticated state for user:', username);
-    
-    // Hide login message
-    const loginMessage = document.getElementById('login-message');
-    if (loginMessage) {
-      loginMessage.style.display = 'none';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find login-message element');
-    }
-    
-    // Show main content
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.style.display = 'block';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find main-content element');
-    }
-    
-    // Update username if we have it
-    const usernameElem = document.getElementById('username');
-    if (usernameElem && username) {
-      usernameElem.textContent = username;
-    }
-  }
-
-  function showUnauthenticatedState() {
-    console.log('[LeetAnki Popup] Showing unauthenticated state');
-    
-    // Show login message
-    const loginMessage = document.getElementById('login-message');
-    if (loginMessage) {
-      loginMessage.style.display = 'block';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find login-message element');
-    }
-    
-    // Hide main content
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.style.display = 'none';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find main-content element');
-    }
-  }
-
-  // Add the missing showErrorState function
-  function showErrorState(errorMessage) {
-    console.log('[LeetAnki Popup] Showing error state:', errorMessage);
-    
-    // Hide login message and main content
-    const loginMessage = document.getElementById('login-message');
-    if (loginMessage) {
-      loginMessage.style.display = 'none';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find login-message element');
-    }
-    
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.style.display = 'none';
-    } else {
-      console.warn('[LeetAnki Popup] Could not find main-content element');
-    }
-    
-    // Show the error message
-    const errorElement = document.getElementById('error-message');
-    if (errorElement) {
-      const errorTextElement = document.getElementById('error-text');
-      if (errorTextElement) {
-        errorTextElement.textContent = errorMessage || 'An unknown error occurred';
-      }
-      
-      // Add a reload button if this is a connection error
-      if (errorMessage && (
-          errorMessage.includes('content script is not ready') || 
-          errorMessage.includes('Receiving end does not exist')
-        )) {
-        // Check if we already have a reload button
-        let reloadButton = document.getElementById('reload-leetcode-button');
-        if (!reloadButton) {
-          // Create a reload button
-          reloadButton = document.createElement('button');
-          reloadButton.id = 'reload-leetcode-button';
-          reloadButton.className = 'button';
-          reloadButton.textContent = 'Reload LeetCode Tab';
-          reloadButton.addEventListener('click', reloadLeetCodeTab);
-          errorElement.appendChild(reloadButton);
-        }
-      }
-      
-      errorElement.classList.remove('hidden');
-    } else {
-      console.warn('[LeetAnki Popup] Could not find error-message element');
-    }
-  }
-  
-  /**
-   * Reload the LeetCode tab
-   */
-  async function reloadLeetCodeTab() {
-    try {
-      const leetCodeTabs = await chrome.tabs.query({ url: 'https://leetcode.com/*' });
-      
-      if (leetCodeTabs.length === 0) {
-        alert('No LeetCode tab found. Please open LeetCode.com first.');
-        return;
-      }
-      
-      // Reload the first LeetCode tab found
-      chrome.tabs.reload(leetCodeTabs[0].id, {}, () => {
-        // Show loading state on button
-        const reloadButton = document.getElementById('reload-leetcode-button');
-        if (reloadButton) {
-          reloadButton.textContent = 'Reloading...';
-          reloadButton.disabled = true;
-        }
-        
-        // Give some time for the page to reload and content script to initialize
-        setTimeout(() => {
-          // Attempt to update popup content again
-          updatePopupContent().then(() => {
-            console.log('[LeetAnki Popup] Refreshed popup content after tab reload');
-          }).catch(error => {
-            console.error('[LeetAnki Popup] Error updating popup after reload:', error);
-          });
-        }, 3000); // Wait 3 seconds
-      });
-    } catch (error) {
-      console.error('[LeetAnki Popup] Error reloading LeetCode tab:', error);
-      alert('Error reloading LeetCode tab: ' + error.message);
-    }
-  }
-}); 
+// Initialize the popup when the DOM is loaded
+document.addEventListener('DOMContentLoaded', initialize);

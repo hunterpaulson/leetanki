@@ -15,7 +15,7 @@ You must follow these instructions precisely. I need extremely specific guidance
 Provide the exact file structure and boilerplate code for a Chrome extension with the following components:
 - manifest.json (use Manifest V3)
 - background script
-- popup interface
+- popup interface 
 - content script that will run on LeetCode pages
 - necessary HTML/CSS files
 
@@ -29,8 +29,8 @@ The extension needs to know when a user is logged into LeetCode. Implement a sys
 
 ### Step 2.1: Analyze LeetCode API/DOM Structure
 Provide detailed instructions for:
-- Identifying how to access the user's completed problems (either via API or DOM scraping)
-- The exact API endpoints or DOM elements to target
+- Identifying how to access the user's completed problems (via graphql api)
+- The exact API endpoints to target
 - How to extract problem metadata (problem ID, title, difficulty, tags/categories)
 
 ### Step 2.2: Implement Data Retrieval
