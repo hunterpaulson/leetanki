@@ -5,12 +5,12 @@
  * problem synchronization, and communication with the extension.
  */
 
-// Enable debug mode
-const DEBUG = true;
+// Enable debug mode for development
+const DEBUG_CONTENT = true;
 
 // Helper function for debug logging
-function log(...args) {
-  if (DEBUG) console.log('[LeetAnki Content]', ...args);
+function logContent(...args) {
+  if (DEBUG_CONTENT) console.log('[LeetAnki-Content]', ...args);
 }
 
 // Storage keys for consistent access across components
@@ -24,344 +24,218 @@ const STORAGE_KEYS = {
   SETTINGS: 'settings'
 };
 
-// Initialize the content script
-function initialize() {
-  log('Initializing content script');
-  
-  try {
-    // Check authentication status
-    checkAuthStatus();
-    
-    // Set up URL change detection
-    setupUrlChangeListener();
-    
-    // Listen for messages from popup and background script
-    setupMessageListeners();
-    
-    log('Content script initialized successfully');
-  } catch (error) {
-    console.error('Error initializing content script:', error);
-  }
-}
+// Track current auth state globally in this script
+let currentAuthStatus = {
+  isAuthenticated: false,
+  username: null,
+  userSlug: null
+};
 
-// Check user authentication status
+/**
+ * Check LeetCode authentication status using the API module.
+ * Sends message to background script ONLY if status changes.
+ * Updates the global currentAuthStatus variable.
+ */
 async function checkAuthStatus() {
+  logContent('Checking authentication status...');
   try {
-    log('Checking authentication status');
-    
-    // Check if user is authenticated using the API
-    const authStatus = await window.LeetCodeAPI.checkAuth();
-    
-    log('Auth status:', authStatus);
-    
-    // Send auth status to the background script
-    chrome.runtime.sendMessage({
-      action: 'updateAuthStatus',
-      status: authStatus.isAuthenticated,
-      userInfo: authStatus.isAuthenticated ? {
-        username: authStatus.username,
-        userId: authStatus.userId
-      } : null
-    });
-    
-    // If authenticated, check if we need to sync
-    if (authStatus.isAuthenticated) {
-      checkSyncNeeded();
-    }
-    
-    return authStatus;
-  } catch (error) {
-    console.error('Error checking authentication:', error);
-    return { isAuthenticated: false };
-  }
-}
+    const userInfo = await window.leetcodeApi.getUserInfo(); 
+    const isAuthenticated = userInfo.isSignedIn;
+    const username = userInfo.username;
+    const userSlug = userInfo.userSlug; // Get userSlug as well
 
-// Set up listener for URL changes
-function setupUrlChangeListener() {
-  let lastUrl = window.location.href;
-  
-  // Use a MutationObserver to detect URL changes
-  const observer = new MutationObserver(() => {
-    if (lastUrl !== window.location.href) {
-      log('URL changed:', window.location.href);
-      lastUrl = window.location.href;
+    logContent('Auth check API result:', { isAuthenticated, username, userSlug });
+
+    if (isAuthenticated !== currentAuthStatus.isAuthenticated || username !== currentAuthStatus.username || userSlug !== currentAuthStatus.userSlug) {
+      logContent(`Authentication status changed: ${currentAuthStatus.isAuthenticated} -> ${isAuthenticated}. Sending update.`);
+      // Update global state, including userSlug
+      currentAuthStatus = { isAuthenticated, username, userSlug }; 
       
-      // Re-check authentication on URL change
-      checkAuthStatus();
-    }
-  });
-  
-  // Start observing the document body
-  observer.observe(document.body, { childList: true, subtree: true });
-  
-  // Also hook into history API for SPA navigation
-  const originalPushState = history.pushState;
-  history.pushState = function() {
-    originalPushState.apply(this, arguments);
-    
-    if (lastUrl !== window.location.href) {
-      log('URL changed via pushState:', window.location.href);
-      lastUrl = window.location.href;
-      
-      // Re-check authentication on URL change
-      checkAuthStatus();
-    }
-  };
-}
-
-// Set up message listeners
-function setupMessageListeners() {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    log('Received message:', message);
-    
-    // Handle different message types
-    switch (message.action) {
-      case 'isContentScriptReady':
-        sendResponse({ ready: true });
-        break;
-        
-      case 'checkAuthStatus':
-        window.LeetCodeAPI.checkAuth()
-          .then(status => sendResponse(status))
-          .catch(error => {
-            console.error('Error checking auth status:', error);
-            sendResponse({ isAuthenticated: false });
-          });
-        return true; // Keep channel open for async response
-        
-      case 'sync':
-        syncProblems()
-          .then(result => sendResponse(result))
-          .catch(error => {
-            console.error('Error syncing problems:', error);
-            sendResponse({ success: false, error: error.message });
-          });
-        return true;
-        
-      case 'getProblemDetails':
-        window.LeetCodeAPI.fetchProblemDetails(message.titleSlug)
-          .then(problem => sendResponse({ success: true, problem }))
-          .catch(error => {
-            console.error(`Error fetching problem ${message.titleSlug}:`, error);
-            sendResponse({ success: false, error: error.message });
-          });
-        return true;
-    }
-  });
-}
-
-// Check if a sync is needed
-async function checkSyncNeeded() {
-  try {
-    log('Checking if sync is needed');
-    
-    // Get auth status and last sync time
-    const authStatus = await window.LeetCodeAPI.checkAuth();
-    
-    if (!authStatus.isAuthenticated) {
-      log('Not authenticated, skipping sync check');
-      return;
-    }
-    
-    const data = await chrome.storage.local.get([
-      STORAGE_KEYS.LAST_SYNC,
-      STORAGE_KEYS.SETTINGS
-    ]);
-    
-    const lastSync = data[STORAGE_KEYS.LAST_SYNC];
-    const now = new Date();
-    
-    // Determine if sync is needed
-    let syncNeeded = false;
-    
-    if (!lastSync) {
-      // Never synced before
-      syncNeeded = true;
-      log('Sync needed: First sync');
+      chrome.runtime.sendMessage({
+        action: 'updateAuthStatus',
+        status: isAuthenticated,
+        // Include userSlug in userInfo
+        userInfo: isAuthenticated ? { username: username, userSlug: userSlug } : null
+      }).catch(error => {
+         logContent('Error sending auth update to background:', error?.message || error);
+      });
     } else {
-      const lastSyncDate = new Date(lastSync);
-      const syncInterval = (data[STORAGE_KEYS.SETTINGS]?.syncInterval || 6) * 60 * 60 * 1000; // Convert hours to ms
-      
-      if (now - lastSyncDate > syncInterval) {
-        // Last sync was more than the sync interval ago
-        syncNeeded = true;
-        log(`Sync needed: Last sync was ${Math.round((now - lastSyncDate) / (60 * 60 * 1000))} hours ago`);
-      }
-    }
-    
-    // Perform sync if needed
-    if (syncNeeded) {
-      showNotification('Syncing your LeetCode problems...');
-      const result = await syncProblems();
-      
-      if (result.success) {
-        showNotification(`Synced ${Object.keys(result.problems).length} problems`, true);
-      } else {
-        showNotification(`Sync failed: ${result.error}`, true);
-      }
+      logContent('Authentication status unchanged.');
     }
   } catch (error) {
-    console.error('Error checking if sync needed:', error);
+    console.error('Error during checkAuthStatus execution:', error);
+    if (currentAuthStatus.isAuthenticated) {
+       logContent('Assuming logout due to error during auth check. Updating background...');
+       // Clear global state
+       currentAuthStatus = { isAuthenticated: false, username: null, userSlug: null }; 
+       chrome.runtime.sendMessage({
+           action: 'updateAuthStatus',
+           status: false,
+           userInfo: null
+       }).catch(error => {
+          logContent('Error sending forced logout update to background:', error?.message || error);
+       });
+    }
   }
 }
 
-// Sync problems from LeetCode
-async function syncProblems() {
-  try {
-    log('Starting problem sync');
-    
-    // Check authentication
-    const authStatus = await window.LeetCodeAPI.checkAuth();
-    
-    if (!authStatus.isAuthenticated) {
-      log('Not authenticated, cannot sync');
-      return { success: false, error: 'Not authenticated' };
-    }
-    
-    // Show sync notification
-    showNotification('Syncing your LeetCode problems...');
-    
-    // Step 1: Fetch all tags (for hierarchical knowledge structure)
-    log('Fetching all tags');
-    const tags = await window.LeetCodeAPI.fetchAllTags();
-    log(`Fetched ${Object.keys(tags).length} tags`);
-    
-    // Step 2: Fetch all solved problems
-    log(`Fetching solved problems for ${authStatus.username}`);
-    const solvedData = await window.LeetCodeAPI.fetchSolvedProblems(authStatus.username);
-    log(`Fetched ${Object.keys(solvedData.problems).length} solved problems`);
-    
-    // Step 3: Fetch additional details for a sample of problems
-    // This will enrich the data with difficulty and tags
-    if (Object.keys(solvedData.problems).length > 0) {
-      log('Fetching additional problem details...');
-      showNotification('Fetching problem details...');
-      
-      // Take a sample of up to 10 problems to get their details
-      // In a real implementation, you might want to batch this for all problems
-      const sampleProblems = Object.keys(solvedData.problems).slice(0, 10);
-      const problemDetailsMap = await window.LeetCodeAPI.fetchProblemsDetails(sampleProblems);
-      
-      // Update the problems with the details
-      for (const titleSlug of sampleProblems) {
-        const details = problemDetailsMap[titleSlug];
-        if (details) {
-          solvedData.problems[titleSlug].difficulty = details.difficulty;
-          solvedData.problems[titleSlug].tags = details.tags.map(tag => tag.slug);
-        }
-      }
-      
-      log(`Updated details for ${sampleProblems.length} problems`);
-    }
-    
-    // Step 4: Merge tags data
-    const mergedTags = { ...tags };
-    Object.entries(solvedData.tags).forEach(([slug, tagData]) => {
-      if (mergedTags[slug]) {
-        mergedTags[slug].count = tagData.count;
-        mergedTags[slug].category = tagData.category;
-      }
-    });
-    
-    // Step 4: Send data to background script
-    chrome.runtime.sendMessage({
-      action: 'syncComplete',
-      problems: solvedData.problems,
-      tags: mergedTags,
-      stats: solvedData.stats
-    });
-    
-    // Show completion notification
-    showNotification(`Successfully synced ${Object.keys(solvedData.problems).length} problems`, true);
-    
-    return {
-      success: true,
-      problems: solvedData.problems,
-      tags: mergedTags,
-      stats: solvedData.stats
-    };
-  } catch (error) {
-    console.error('Error syncing problems:', error);
-    showNotification(`Sync failed: ${error.message}`, true);
-    return { success: false, error: error.message };
+/**
+ * Get CSRF token from cookies (duplicated from API module for standalone use if needed, though API module is preferred).
+ */
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+     try {
+        return decodeURIComponent(parts.pop().split(';').shift());
+     } catch (e) {
+        logContent(`Error decoding cookie ${name}:`, e);
+        return null;
+     }
   }
+  return null;
 }
 
-// Show notification to the user
-function showNotification(message, isComplete = false) {
-  // Check if notification element already exists
-  let notificationEl = document.getElementById('leetanki-notification');
-  
-  if (!notificationEl) {
-    // Create notification element
-    notificationEl = document.createElement('div');
-    notificationEl.id = 'leetanki-notification';
-    
-    // Style the notification
-    Object.assign(notificationEl.style, {
-      position: 'fixed',
-      bottom: '20px',
-      right: '20px',
-      zIndex: '10000',
-      padding: '12px 16px',
-      borderRadius: '8px',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      color: 'white',
-      fontSize: '14px',
-      transition: 'opacity 0.3s ease',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-      display: 'flex',
-      alignItems: 'center',
-      opacity: '0'
-    });
-    
-    document.body.appendChild(notificationEl);
-    
-    // Fade in
-    setTimeout(() => {
-      notificationEl.style.opacity = '1';
-    }, 10);
-  }
-  
-  // Update notification content
-  if (!isComplete) {
-    notificationEl.innerHTML = `
-      <div style="display: inline-block; margin-right: 12px; width: 16px; height: 16px; border: 2px solid #f0f0f0; border-top: 2px solid #3498db; border-radius: 50%; animation: leetanki-spin 1s linear infinite;"></div>
-      <span>${message}</span>
-    `;
-    
-    // Add animation style if not already added
-    if (!document.getElementById('leetanki-styles')) {
-      const style = document.createElement('style');
-      style.id = 'leetanki-styles';
-      style.textContent = `
-        @keyframes leetanki-spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `;
-      document.head.appendChild(style);
+// --- Message Handling ---
+
+let isSyncing = false; // Prevent multiple syncs running concurrently
+
+/**
+ * Handle messages from the background script.
+ * @param {object} message The message received.
+ * @param {chrome.runtime.MessageSender} sender Info about the sender.
+ * @param {Function} sendResponse Function to call to send a response.
+ * @returns {boolean | undefined} True to indicate async response, undefined otherwise.
+ */
+async function handleBackgroundMessage(message, sender, sendResponse) {
+  logContent('Received message from background:', message.action, message);
+
+  if (message.action === 'sync') {
+    logContent('Sync request received.');
+    if (isSyncing) {
+        logContent('Sync already in progress. Ignoring request.');
+        sendResponse({ success: false, message: 'Sync already in progress' });
+        return false; // Sync already running, respond synchronously
     }
+    
+    // Check auth state first using the global variable updated by checkAuthStatus
+    if (currentAuthStatus.isAuthenticated && currentAuthStatus.username) {
+        isSyncing = true; // Set flag early
+        logContent('User is authenticated, fetching stats before starting sync...');
+        
+        try {
+            // Get user slug from the stored auth status
+            const userSlug = currentAuthStatus.userSlug; 
+            if (!userSlug) {
+                 throw new Error('User slug is missing from auth status.');
+            }
+            
+            // Fetch total count first
+            const totalProblemCount = await window.leetcodeApi.getUserStats(userSlug);
+            logContent(`Total accepted problems count: ${totalProblemCount}`);
+            
+            // Notify background that sync is starting with the total count
+            await chrome.runtime.sendMessage({ 
+                action: 'syncStarted', 
+                totalCount: totalProblemCount 
+            });
+            logContent('Sent syncStarted message to background.');
+
+            // Define callbacks
+            const progressCallback = (batchData) => {
+                chrome.runtime.sendMessage({ action: 'syncProgress', data: batchData }).catch(err => {
+                    logContent('Error sending syncProgress to background:', err?.message || err);
+                });
+            };
+            const completionCallback = () => {
+                logContent('API module reported sync completion. Notifying background.');
+                isSyncing = false;
+                chrome.runtime.sendMessage({ action: 'syncComplete' }).catch(err => {
+                    logContent('Error sending syncComplete to background:', err?.message || err);
+                });
+            };
+            const errorCallback = (errorMessage) => {
+                logContent('API module reported sync error:', errorMessage);
+                isSyncing = false;
+                chrome.runtime.sendMessage({ action: 'syncError', error: errorMessage }).catch(err => {
+                     logContent('Error sending syncError to background:', err?.message || err);
+                });
+            };
+
+            // Initiate the sync process (don't await, it runs in background)
+            window.leetcodeApi.syncAllSubmissions(progressCallback, completionCallback, errorCallback);
+            sendResponse({ success: true, message: 'Sync initiated successfully.' });
+
+        } catch (error) {
+            console.error('Error during sync initiation (fetching stats or sending start message):', error);
+            isSyncing = false; // Reset flag on error
+            // Notify background of the error *if* sync didn't even start
+            chrome.runtime.sendMessage({ action: 'syncError', error: `Sync initiation failed: ${error.message}` }).catch(err => {
+                 logContent('Error sending sync initiation error message:', err?.message || err);
+            });
+            sendResponse({ success: false, message: `Sync initiation failed: ${error.message}` });
+        }
+        
+    } else {
+       logContent('Sync requested but user is not authenticated or username/slug missing. Aborting.');
+       sendResponse({ success: false, message: 'User not authenticated or user info missing' });
+       return false; // Respond synchronously
+    }
+    // Return true because we are doing async work (fetching stats, sending messages)
+    // before potentially calling sendResponse in the success path of the try block. 
+    // The actual syncAllSubmissions runs in the background, but the initiation is async.
+    return true; 
+  }
+
+  // Handle other potential messages from background
+  logContent('Unknown action received:', message.action);
+  sendResponse({ success: false, message: `Unknown action: ${message.action}` });
+  return false; // Indicate synchronous response
+}
+
+/**
+ * Initialize the content script.
+ * Sets up periodic auth checks and message listener.
+ */
+async function initialize() {
+  // Ensure the leetcodeApi is available
+  if (typeof window.leetcodeApi === 'undefined') {
+     console.error('[LeetAnki-Content] LeetCode API module (leetcode-api.js) not found! Cannot initialize.');
+     setTimeout(initialize, 2000); 
+     return;
+  }
+  logContent('LeetAnki content script initializing...');
+
+  // Perform initial authentication check immediately and store result
+  await checkAuthStatus(); // Wait for the first check
+
+  // Periodically check authentication status
+  const AUTH_CHECK_INTERVAL = 5 * 60 * 1000; 
+  setInterval(checkAuthStatus, AUTH_CHECK_INTERVAL);
+  logContent(`Auth status check interval set to ${AUTH_CHECK_INTERVAL / 1000} seconds.`);
+
+  // Listen for messages from the background script or popup
+  chrome.runtime.onMessage.addListener(handleBackgroundMessage);
+
+  logContent('Content script initialization complete. Listening for messages.');
+}
+
+// --- Script Execution ---
+
+// Wait for the DOM to be ready before initializing, although API doesn't strictly need it
+document.addEventListener('DOMContentLoaded', () => {
+    logContent('DOM fully loaded and parsed.');
+    initialize();
+});
+
+// Add a fallback initialization in case DOMContentLoaded doesn't fire as expected
+// or if the script is injected late.
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    // If loaded late, leetcodeApi might already exist
+    if (typeof window.leetcodeApi !== 'undefined') {
+       initialize();
+    } // Otherwise, the DOMContentLoaded listener should handle it.
   } else {
-    notificationEl.innerHTML = `
-      <div style="display: inline-block; margin-right: 12px; color: #2ecc71;">✓</div>
-      <span>${message}</span>
-    `;
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      notificationEl.style.opacity = '0';
-      setTimeout(() => {
-        notificationEl.remove();
-      }, 300);
-    }, 5000);
-  }
-}
-
-// Initialize the content script when the page loads
-document.addEventListener('DOMContentLoaded', initialize);
-
-// Fallback initialization for cases where DOMContentLoaded already fired
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  initialize();
+   // Backup listener just in case
+   window.addEventListener('load', initialize, { once: true });
 }
