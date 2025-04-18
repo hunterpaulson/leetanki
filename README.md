@@ -12,10 +12,10 @@ A Chrome extension that implements spaced repetition learning for LeetCode probl
 ## Installation (Development Mode)
 
 1. Clone this repository:
-   """
+```
    git clone https://github.com/yourusername/leetanki.git
    cd leetanki
-   """
+```
 
 2. Open Chrome and navigate to `chrome://extensions/`
 
@@ -36,7 +36,7 @@ A Chrome extension that implements spaced repetition learning for LeetCode probl
 
 ### Project Structure
 
-"""
+```
 leetanki/
 ├── manifest.json         # Extension configuration
 ├── background.js         # Background service worker
@@ -45,18 +45,18 @@ leetanki/
 │   ├── popup.js
 │   └── popup.css
 ├── content/              # Content scripts for LeetCode pages
-│   └── content.js
-└── assets/               # Images and other assets
-    └── icon.png (in various sizes)
-"""
+│   ├── content.js
+│   └── leetcode-api.js
+```
 
 ### Current Status
 
 This project is under active development. Current implemented features:
 
-- Basic extension structure
-- Authentication detection on LeetCode
-- Popup UI framework
+- Authentication detection on leetcode.com
+- Very basic UI
+- Syncing completed problems from leetcode.com
+- Basic spaced repetition algorithm
 
 ## License
 
